@@ -7,17 +7,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mew.diploma.dto.Comments;
-import com.mew.diploma.model.Comment;
+import com.mew.diploma.dto.CommentDTO;
+import com.mew.diploma.dto.CommentsDTO;
 import com.mew.diploma.service.CommentService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @CrossOrigin(value = "http://localhost:3000")
-@RestController("/ads")
+@RestController
+@RequestMapping("/ads/{adId}")
 public class CommentController {
     private final CommentService commentService;
 
@@ -25,27 +27,27 @@ public class CommentController {
         this.commentService = commentService;
     }
     
-    @GetMapping("/{adId}/comments")
+    @GetMapping("/comments")
     @ResponseStatus(HttpStatus.OK)
-    public Comments getAdComments(@PathVariable long adId, @RequestBody long id) {
-        return commentService.getAdComments(id);
+    public CommentsDTO getAdComments(@PathVariable long adId) {
+        return commentService.getAdComments(adId);
     }
 
-    @PostMapping("/{adId}/comments")
+    @PostMapping("/comments")
     @ResponseStatus(HttpStatus.OK)
-    public Comment newComment(@PathVariable long adId, @RequestBody long id, String text) {
-        return commentService.newComment(id, text);
+    public CommentDTO newComment(@PathVariable long adId, @RequestBody String text) {
+        return commentService.newComment(text);
     }
 
-    @DeleteMapping("/{adId}/comments/{id}")
+    @DeleteMapping("/comments/{commentId}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteComment(@PathVariable long adId, @PathVariable long id) {
+    public void deleteComment(@PathVariable long adId, @PathVariable("commentId") long id) {
         commentService.deleteComment(id);
     }
 
-    @PatchMapping("/{adId}/comments/{id}")
+    @PatchMapping("/comments/{commentId}")
     @ResponseStatus(HttpStatus.OK)
-    public Comment editComment(@PathVariable long adId, @PathVariable long id, @RequestBody String text){
+    public CommentDTO editComment(@PathVariable long adId, @PathVariable("commentId") long id, @RequestBody String text){
         return commentService.editComment(id, text);
     }
 }

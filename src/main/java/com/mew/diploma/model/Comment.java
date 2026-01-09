@@ -1,51 +1,53 @@
 package com.mew.diploma.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
+import jakarta.persistence.*;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import java.time.Instant;
 
 @Entity
 @Table(name = "comment")
 public class Comment {
     
-    @Column(name="author")
-    private long author;
-    @Column(name="created_at")
-    private int createdAt;
     @Id
-    @Column(name="id")
-    @GeneratedValue
-    private long id;
-    @Column(name="comment_text")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @Column(name = "created_at")
+    private Long createdAt;
+    
+    @Column(name = "comment_text", length = 1000)
     private String text;
-    @Column(name="comment_ad")
-    private long ad;
+    
+    @Column(name = "comment_ad")
+    private Long ad;
 
-    public long getAuthor() {
-        return author;
+    @Column(name = "author_id")
+    private Long authorId;
+    
+    public Comment() {
+    }
+    
+    public Comment(String text, Long ad) {
+        this.text = text;
+        this.ad = ad;
+        this.createdAt = Instant.now().toEpochMilli();
     }
 
-    public void setAuthor(long author) {
-        this.author = author;
-    }
-
-    public int getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(int createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
     }
 
     public String getText() {
@@ -56,11 +58,19 @@ public class Comment {
         this.text = text;
     }
 
-    public long getAd() {
+    public Long getAd() {
         return ad;
     }
 
-    public void setAd(long ad) {
+    public void setAd(Long ad) {
         this.ad = ad;
+    }
+
+    public Long getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(Long authorId) {
+        this.authorId = authorId;
     }
 }

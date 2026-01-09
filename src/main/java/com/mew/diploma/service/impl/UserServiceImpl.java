@@ -1,15 +1,15 @@
 package com.mew.diploma.service.impl;
 
-import java.util.Optional;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.mew.diploma.dto.UpdatePasswordDTO;
+import com.mew.diploma.dto.UpdateUserDTO;
 import com.mew.diploma.mapper.UserMapper;
-import com.mew.diploma.model.Avatar;
+import com.mew.diploma.model.Image;
 import com.mew.diploma.model.User;
+import com.mew.diploma.repository.ImageRepository;
 import com.mew.diploma.repository.UserRepository;
 import com.mew.diploma.service.UserService;
 
@@ -17,44 +17,56 @@ import com.mew.diploma.service.UserService;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserMapper mapper;
+    
     private final UserRepository userRepository;
+    private final PasswordEncoder encoder;
+    private final ImageRepository imageRepository;
+    private final UserMapper mapper;
 
-    public UserServiceImpl(UserMapper mapper, UserRepository userRepository){
-        this.mapper = mapper;
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, 
+        ImageRepository imageRepository, UserMapper mapper){
         this.userRepository = userRepository;
-    }
-
-    public Authentication authefication() {
-        return SecurityContextHolder.getContext().getAuthentication();
-    }
-
-    @Override
-    public User getUser() {
-        return mapper.fromUserDetails((UserDetails)authefication().getPrincipal());
+        this.encoder = passwordEncoder;
+        this.imageRepository = imageRepository;
+        this.mapper = mapper;
     }
 
     @Override
-    public void setPassword(String password, String newPassword) {
-        User user = getUser();
-        user.setPassword(newPassword);
+    public User getUser(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public void setPassword(String email, UpdatePasswordDTO updatePassword) {
+        User user = getUser(email);
+        user.setPassword(encoder.encode(updatePassword.getNewPassword()));
         userRepository.save(user);
     }
 
     @Override
-    public User changeUser(String firstName, String lastName, String phone) {
-        User user = getUser();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setPhone(phone);
+    public User changeUser(String email, UpdateUserDTO updateUser) {
+        User user = getUser(email);
+        user.setFirstName(updateUser.getFirstName());
+        user.setLastName(updateUser.getLastName());
+        user.setPhone(updateUser.getPhone());
         userRepository.save(user);
         return user;
     }
 
     @Override
-    public void changeAvatar(Avatar avatar) {
-        User user = getUser();
-        user.setAvatar(avatar.getId());
+    public String changeAvatar(String email, MultipartFile avatar) {
+        User user = getUser(email);
+        Image image = new Image();
+
+        try {
+                image.setData(avatar.getBytes());
+                image.setMediaType(avatar.getContentType());
+                image.setFilePath(avatar.getOriginalFilename());
+            } catch (Exception e) {
+            }
+        Image savedImage = imageRepository.save(image);
+        user.setImageId(savedImage.getId());
         userRepository.save(user);
+        return mapper.toDto(user).getImageId();
     }
 }

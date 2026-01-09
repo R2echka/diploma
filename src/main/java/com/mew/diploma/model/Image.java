@@ -1,6 +1,8 @@
 package com.mew.diploma.model;
 
-import javax.persistence.GeneratedValue;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Lob;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,10 +15,17 @@ public class Image {
 
     @Id
     @Column(name="id")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name="file_path")
     private String filePath;
+
+    @Column(name="media_type")
+    private String mediaType;
+
+    @Column(name="data")
+    @Lob
+    private byte[] data;
 
     public Long getId() {
         return id;
@@ -32,5 +41,21 @@ public class Image {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
     }
 }

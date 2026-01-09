@@ -1,44 +1,46 @@
 package com.mew.diploma.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "ad")
 public class Ad {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    
+    @Column(name = "ad_description")
+    private String description;
+    
+    @Column(name = "price")
+    private Integer price;
+    
+    @Column(name = "title")
+    private String title;
+    
+    @Column(name = "image_id")
+    private Long image;
+    
+    @Column(name = "author_id")
+    private Long authorId;
 
-    public Ad(long author, String description, int price, String title){
-        this.author = author;
+    public Ad() {
+    }
+    
+    public Ad(String description, Integer price, String title) {
         this.description = description;
         this.price = price;
         this.title = title;
     }
     
-    @Column(name="author")
-    private long author;
-    @Column(name="ad_description")
-    private String description;
-    @Id
-    @Column(name="id")
-    @GeneratedValue
-    private long id;
-    @Column(name="price")
-    private int price;
-    @Column(name="title")
-    private String title;
-    @Column(name="image_id")
-    private String image;
-
-    public long getAuthor() {
-        return author;
+    public Long getId() {
+        return id;
     }
 
-    public void setAuthor(long author) {
-        this.author = author;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getDescription() {
@@ -49,19 +51,11 @@ public class Ad {
         this.description = description;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public int getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 
@@ -73,11 +67,19 @@ public class Ad {
         this.title = title;
     }
 
-    public String getImage() {
+    public Long getImage() {
         return image;
     }
 
-    public void setImage(String image) {
+    public void setImage(Long image) {
         this.image = image;
+    }
+
+    public Long getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(Long authorId) {
+        this.authorId = authorId;
     }
 }

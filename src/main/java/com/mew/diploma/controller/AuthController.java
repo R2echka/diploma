@@ -26,7 +26,7 @@ public class AuthController {
         if(authService.login(login)) {
             return ResponseEntity.status(200).build();
         }else{
-            return ResponseEntity.status(400).build();
+            return ResponseEntity.status(401).build();
         }
     }
 
