@@ -1,5 +1,7 @@
 package com.mew.diploma.service.impl;
 
+import java.time.Instant;
+
 import org.springframework.stereotype.Service;
 
 import com.mew.diploma.dto.CommentDTO;
@@ -14,11 +16,13 @@ import com.mew.diploma.service.UserService;
 public class CommentServiceImpl implements CommentService {
     CommentRepository commentRepository;
     CommentMapper mapper;
+    UserService userService;
 
 
-    public CommentServiceImpl(CommentRepository commentRepository, CommentMapper mapper){
+    public CommentServiceImpl(CommentRepository commentRepository, CommentMapper mapper, UserService userService){
         this.commentRepository = commentRepository;
         this.mapper = mapper;
+        this.userService = userService;
     }
 
     @Override
@@ -27,9 +31,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDTO newComment(String text) {
+    public CommentDTO newComment(long id, String text, String email) {
         Comment comment = new Comment();
         comment.setText(text);
+        comment.setCreatedAt(Instant.now().toEpochMilli());
+        comment.setAuthorId(userService.getUser(email).getId());
+        comment.setAd(id);
         commentRepository.save(comment);
         return mapper.toDTO(comment);
     }

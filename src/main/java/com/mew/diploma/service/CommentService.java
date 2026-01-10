@@ -7,7 +7,7 @@ import com.mew.diploma.model.Comment;
 public interface CommentService {
     
     CommentsDTO getAdComments(long id);
-    CommentDTO newComment(String text);
+    CommentDTO newComment(long id, String text, String email);
     void deleteComment(long id);
     CommentDTO editComment(long id, String text);
 }
