@@ -37,14 +37,16 @@ public class CommentMapper {
 
     public CommentDTO toDTO(Comment comment){
         User author = userRepository.findById((long)comment.getAuthorId());
-        Image image = imageRepository.findById((long)author.getImageId());
+        Image image = imageRepository.findById(author.getImageId()).orElse(null);
 
         CommentDTO dto = new CommentDTO();
 
-        String base64Image = java.util.Base64.getEncoder()
+        if(image != null){
+            String base64Image = java.util.Base64.getEncoder()
                 .encodeToString(image.getData());
-        String mediaType = image.getMediaType();
-        dto.setAuthorImage("data:" + mediaType + ";base64," + base64Image);
+            String mediaType = image.getMediaType();
+            dto.setAuthorImage("data:" + mediaType + ";base64," + base64Image);
+        }
 
 
         dto.setAuthor(author.getId());

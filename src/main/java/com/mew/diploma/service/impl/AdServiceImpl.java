@@ -1,5 +1,6 @@
 package com.mew.diploma.service.impl;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,6 +11,8 @@ import com.mew.diploma.dto.UpdateAdDTO;
 import com.mew.diploma.mapper.AdMapper;
 import com.mew.diploma.model.Ad;
 import com.mew.diploma.model.Image;
+import com.mew.diploma.model.Role;
+import com.mew.diploma.model.User;
 import com.mew.diploma.repository.AdRepository;
 import com.mew.diploma.repository.ImageRepository;
 import com.mew.diploma.service.AdService;
@@ -57,18 +60,29 @@ public class AdServiceImpl implements AdService {
         }
 
     @Override
-    public void deleteAd(long id) {
-        adRepository.deleteById(id);
+    public ResponseEntity<?> deleteAd(long id, String email) {
+        User user = userService.getUser(email);
+        if (user.getRole().equals(Role.ADMIN) || adRepository.findAuthorIdById(id).equals(user.getId())) {
+            adRepository.deleteById(id);
+            return ResponseEntity.status(204).build();
+        } else{
+            return ResponseEntity.status(403).build();
+        }
     }
 
     @Override
-    public AdDTO changeAd(long id, UpdateAdDTO updateAd) {
-        Ad ad = adRepository.findById(id);
-        ad.setTitle(updateAd.getTitle());
-        ad.setPrice(updateAd.getPrice());
-        ad.setDescription(updateAd.getDescription());
-        adRepository.save(ad);
-        return mapper.toDTO(ad);
+    public ResponseEntity<?> changeAd(long id, UpdateAdDTO updateAd, String email) {
+        User user = userService.getUser(email);
+        if (user.getRole().equals(Role.ADMIN) || adRepository.findAuthorIdById(id).equals(user.getId())) {
+            Ad ad = adRepository.findById(id);
+            ad.setTitle(updateAd.getTitle());
+            ad.setPrice(updateAd.getPrice());
+            ad.setDescription(updateAd.getDescription());
+            adRepository.save(ad);
+            return ResponseEntity.status(200).body(mapper.toDTO(ad));
+        } else{
+            return ResponseEntity.status(403).build();
+        }
     }
 
     @Override
@@ -77,18 +91,23 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public String changeAdImage(long id, MultipartFile file) {
-        Ad ad = adRepository.findById(id);
-        Image image = new Image();
-        try {
-                image.setData(file.getBytes());
-                image.setMediaType(file.getContentType());
-                image.setFilePath(file.getOriginalFilename());
-            } catch (Exception e) {
-            }
-        Image savedImage = imageRepository.save(image);
-        ad.setImage(savedImage.getId());
-        adRepository.save(ad);
-        return mapper.toDTO(ad).getImage();
+    public ResponseEntity<?> changeAdImage(long id, MultipartFile file, String email) {
+        User user = userService.getUser(email);
+        if (user.getRole().equals(Role.ADMIN) || adRepository.findAuthorIdById(id).equals(user.getId())) {
+            Ad ad = adRepository.findById(id);
+            Image image = new Image();
+            try {
+                    image.setData(file.getBytes());
+                    image.setMediaType(file.getContentType());
+                    image.setFilePath(file.getOriginalFilename());
+                } catch (Exception e) {
+                }
+            Image savedImage = imageRepository.save(image);
+            ad.setImage(savedImage.getId());
+            adRepository.save(ad);
+        return ResponseEntity.status(200).body(mapper.toDTO(ad).getImage());
+        } else{
+            return ResponseEntity.status(403).build();
+        }
     }
 }

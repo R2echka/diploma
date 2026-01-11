@@ -2,11 +2,11 @@ package com.mew.diploma.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +20,6 @@ import com.mew.diploma.dto.AdDTO;
 import com.mew.diploma.dto.AdInfoDTO;
 import com.mew.diploma.dto.AdsDTO;
 import com.mew.diploma.dto.UpdateAdDTO;
-import com.mew.diploma.model.Image;
 import com.mew.diploma.service.AdService;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -55,15 +54,13 @@ public class AdController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAd(@PathVariable long id){
-        adService.deleteAd(id);
+    public ResponseEntity<?> deleteAd(@PathVariable long id, Authentication authentication){
+        return adService.deleteAd(id, authentication.getName());
     }
 
     @PatchMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public void changeAd(@PathVariable long id, @RequestBody UpdateAdDTO updateAd){
-        adService.changeAd(id, updateAd);
+    public ResponseEntity<?> changeAd(@PathVariable long id, @RequestBody UpdateAdDTO updateAd, Authentication authentication){
+        return adService.changeAd(id, updateAd, authentication.getName());
     }
 
     @GetMapping("/me")
@@ -73,8 +70,7 @@ public class AdController {
     }
 
     @PatchMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public String changeAdImage(@PathVariable long id, @RequestBody MultipartFile image){
-        return adService.changeAdImage(id, image);
+    public ResponseEntity<?> changeAdImage(@PathVariable long id, @RequestBody MultipartFile image, Authentication authentication){
+        return adService.changeAdImage(id, image, authentication.getName());
     }
 }

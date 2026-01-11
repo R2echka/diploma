@@ -1,5 +1,6 @@
 package com.mew.diploma.service;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mew.diploma.dto.AdDTO;
@@ -12,8 +13,8 @@ public interface AdService {
     AdsDTO getAllAds();
     AdDTO newAd(UpdateAdDTO ad, MultipartFile image);
     AdInfoDTO getAd(long id);
-    void deleteAd(long id);
-    AdDTO changeAd(long id, UpdateAdDTO updateAd);
+    ResponseEntity<?> deleteAd(long id, String email);
+    ResponseEntity<?> changeAd(long id, UpdateAdDTO updateAd, String email);
     AdsDTO getUsersAds(String email);
-    String changeAdImage(long id, MultipartFile image);
+    ResponseEntity<?> changeAdImage(long id, MultipartFile image, String email);
 }

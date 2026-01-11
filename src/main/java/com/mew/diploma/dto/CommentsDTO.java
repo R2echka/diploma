@@ -2,8 +2,6 @@ package com.mew.diploma.dto;
 
 import java.util.List;
 
-import com.mew.diploma.model.Comment;
-
 import lombok.Data;
 
 @Data
