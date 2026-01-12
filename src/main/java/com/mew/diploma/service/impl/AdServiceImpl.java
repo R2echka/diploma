@@ -1,15 +1,24 @@
 package com.mew.diploma.service.impl;
 
-import com.mew.diploma.dto.Ads;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.mew.diploma.dto.AdDTO;
+import com.mew.diploma.dto.AdInfoDTO;
+import com.mew.diploma.dto.AdsDTO;
+import com.mew.diploma.dto.UpdateAdDTO;
 import com.mew.diploma.mapper.AdMapper;
 import com.mew.diploma.model.Ad;
 import com.mew.diploma.model.Image;
+import com.mew.diploma.model.Role;
+import com.mew.diploma.model.User;
 import com.mew.diploma.repository.AdRepository;
 import com.mew.diploma.repository.ImageRepository;
-import com.mew.diploma.repository.UserRepository;
 import com.mew.diploma.service.AdService;
 import com.mew.diploma.service.UserService;
 
+@Service
 public class AdServiceImpl implements AdService {
     AdRepository adRepository;
     AdMapper mapper;
@@ -25,49 +34,80 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public Ads getAllAds() {
+    public AdsDTO getAllAds() {
         return mapper.toAds(adRepository.findAll());
     }
 
     @Override
-    public Ad newAd(Ad ad, Image image) {
-        imageRepository.save(image);
-        ad.setImage(image.getId().toString());
-        ad.setAuthor(userService.getUser().getId());
+    public AdDTO newAd(UpdateAdDTO adDTO, MultipartFile file) {
+        Image image = new Image();
+        try {
+                image.setData(file.getBytes());
+                image.setMediaType(file.getContentType());
+                image.setFilePath(file.getOriginalFilename());
+            } catch (Exception e) {
+            }
+        Image savedImage = imageRepository.save(image);
+        Ad ad = mapper.newAd(adDTO);
+        ad.setImage(savedImage.getId());
         adRepository.save(ad);
-        return ad;
+        return mapper.toDTO(ad);
     }
 
     @Override
-        public Ad getAd(long id) {
-            return adRepository.findById(id);
+        public AdInfoDTO getAd(long id) {
+            return mapper.toExtended(adRepository.findById(id));
         }
 
     @Override
-    public void deleteAd(long id) {
-        adRepository.deleteById(id);
+    public ResponseEntity<?> deleteAd(long id, String email) {
+        User user = userService.getUser(email);
+        if (user.getRole().equals(Role.ADMIN) || adRepository.findAuthorIdById(id).equals(user.getId())) {
+            adRepository.deleteById(id);
+            return ResponseEntity.status(204).build();
+        } else{
+            return ResponseEntity.status(403).build();
+        }
     }
 
     @Override
-    public Ad changeAd(long id, String title, Integer price, String description) {
-        Ad ad = adRepository.findById(id);
-        ad.setTitle(title);
-        ad.setPrice(price);
-        ad.setDescription(description);
-        adRepository.save(ad);
-        return ad;
+    public ResponseEntity<?> changeAd(long id, UpdateAdDTO updateAd, String email) {
+        User user = userService.getUser(email);
+        if (user.getRole().equals(Role.ADMIN) || adRepository.findAuthorIdById(id).equals(user.getId())) {
+            Ad ad = adRepository.findById(id);
+            ad.setTitle(updateAd.getTitle());
+            ad.setPrice(updateAd.getPrice());
+            ad.setDescription(updateAd.getDescription());
+            adRepository.save(ad);
+            return ResponseEntity.status(200).body(mapper.toDTO(ad));
+        } else{
+            return ResponseEntity.status(403).build();
+        }
     }
 
     @Override
-    public Ads getUsersAds() {
-        return mapper.toAds(adRepository.findByAuthor(userService.getUser().getId()));
+    public AdsDTO getUsersAds(String email) {
+        return mapper.toAds(adRepository.findByAuthorId(userService.getUser(email).getId()));
     }
 
     @Override
-    public String changeAdImage(long id, Image image) {
-        Ad ad = adRepository.findById(id);
-        ad.setImage(image.getId().toString());
-        return ad.getImage();
+    public ResponseEntity<?> changeAdImage(long id, MultipartFile file, String email) {
+        User user = userService.getUser(email);
+        if (user.getRole().equals(Role.ADMIN) || adRepository.findAuthorIdById(id).equals(user.getId())) {
+            Ad ad = adRepository.findById(id);
+            Image image = new Image();
+            try {
+                    image.setData(file.getBytes());
+                    image.setMediaType(file.getContentType());
+                    image.setFilePath(file.getOriginalFilename());
+                } catch (Exception e) {
+                }
+            Image savedImage = imageRepository.save(image);
+            ad.setImage(savedImage.getId());
+            adRepository.save(ad);
+        return ResponseEntity.status(200).body(mapper.toDTO(ad).getImage());
+        } else{
+            return ResponseEntity.status(403).build();
+        }
     }
-    
 }

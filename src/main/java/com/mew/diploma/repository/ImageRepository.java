@@ -6,4 +6,5 @@ import com.mew.diploma.model.Image;
 
 public interface ImageRepository extends JpaRepository<Image, Long> {
     
+    Image findById(long id);
 }

@@ -1,12 +1,14 @@
 package com.mew.diploma.service;
 
-import com.mew.diploma.dto.Comments;
-import com.mew.diploma.model.Comment;
+import org.springframework.http.ResponseEntity;
+
+import com.mew.diploma.dto.CommentDTO;
+import com.mew.diploma.dto.CommentsDTO;
 
 public interface CommentService {
     
-    Comments getAdComments(long id);
-    Comment newComment(long id, String text);
-    void deleteComment(long id);
-    Comment editComment(long id, String text);
+    CommentsDTO getAdComments(long id);
+    CommentDTO newComment(long id, String text, String email);
+    ResponseEntity<?> deleteComment(long id, String email);
+    ResponseEntity<?> editComment(long id, String text, String email);
 }

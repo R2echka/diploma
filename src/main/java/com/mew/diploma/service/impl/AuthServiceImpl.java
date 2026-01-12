@@ -1,5 +1,10 @@
 package com.mew.diploma.service.impl;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.mew.diploma.dto.Login;
@@ -14,16 +19,32 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final UserMapper mapper;
+    private final PasswordEncoder encoder;
+    private final AuthenticationManager manager;
 
-    public AuthServiceImpl(UserRepository userRepository, UserMapper mapper) {
+
+    public AuthServiceImpl(UserRepository userRepository, UserMapper mapper,
+        PasswordEncoder passwordEncoder, AuthenticationManager manager) {
         this.userRepository = userRepository;
         this.mapper = mapper;
+        this.encoder = passwordEncoder;
+        this.manager = manager;
     }
     
     @Override
     public boolean login(Login login){
-        User user = userRepository.findByEmail(login.getEmail());
-        return user.getPassword().matches(login.getPassword());
+        try {
+            Authentication authentication = manager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    login.getEmail(), 
+                    login.getPassword()
+                )
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            return true;
+        }
+        catch (Exception e) {
+        return false;}
     }
 
     @Override
@@ -31,8 +52,10 @@ public class AuthServiceImpl implements AuthService {
         if(userRepository.existsByEmail(register.getEmail())){
             return false;
         } else {
-            userRepository.save(mapper.fromRegister(register));
-            return true;
+            User user = mapper.fromRegister(register);
+            user.setPassword(encoder.encode(user.getPassword()));
+            userRepository.save(user);
+        return true;
         }
     }
 }

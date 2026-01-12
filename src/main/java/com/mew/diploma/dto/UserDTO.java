@@ -1,38 +1,21 @@
-package com.mew.diploma.model;
+package com.mew.diploma.dto;
+
+import com.mew.diploma.model.Role;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
-@Entity
-@Table(name = "users")
-public class User {
+@Data
+public class UserDTO {
 
-    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "password", nullable = false)
-    private String password;
-
-    @Column(name = "email")
     private String email;
-
-    @Column(name = "first_name")
     private String firstName;
-
-    @Column(name = "last_name")
     private String lastName;
-
-    @Column(name = "phone")
     private String phone;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role")
     private Role role;
-
-    @Column(name = "image_id")
-    private Long imageId;
-    
-    public User(){};
+    private String image;
 
     public Long getId() {
         return id;
@@ -40,14 +23,6 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getEmail() {
@@ -90,11 +65,12 @@ public class User {
         this.role = role;
     }
 
-    public Long getImageId() {
-        return imageId;
+    public String getImageId() {
+        return image;
     }
 
-    public void setImageId(Long imageId) {
-        this.imageId = imageId;
+    public void setImageId(String image) {
+        this.image = image;
     }
+
 }

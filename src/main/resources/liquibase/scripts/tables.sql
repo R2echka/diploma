@@ -5,7 +5,8 @@
         email TEXT UNIQUE,
         first_name TEXT,
         last_name TEXT,
-        phone TEXT
+        phone TEXT,
+        image_id BIGINT
     );
 
     CREATE TABLE ad(
@@ -13,27 +14,19 @@
         ad_description TEXT,
         price INT,
         title TEXT,
-        author BIGINT,
-        image_id TEXT
+        author_id BIGINT
         );
 
     CREATE TABLE comment(
         id SERIAL PRIMARY KEY,
         created_at INT,
         comment_text TEXT,
-        author BIGINT,
-        author_image TEXT,
-        author_first_name TEXT,
-        comment_ad BIGINT
-    );
-
-    CREATE TABLE avatar (
-        id SERIAL PRIMARY KEY,
-        file_path TEXT,
-        user_id BIGINT
+        author_id BIGINT
     );
 
     CREATE TABLE image (
         id SERIAL PRIMARY KEY,
-        file_path TEXT
+        file_path TEXT,
+        media_type TEXT,
+        data BYTEA
     );

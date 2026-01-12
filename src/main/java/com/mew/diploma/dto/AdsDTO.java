@@ -2,15 +2,13 @@ package com.mew.diploma.dto;
 
 import java.util.List;
 
-import com.mew.diploma.model.Ad;
-
 import lombok.Data;
 
 @Data
-public class Ads {
+public class AdsDTO {
     
     private Integer count;
-    private List<Ad> results;
+    private List<AdDTO> results;
 
     public Integer getCount() {
         return count;
@@ -20,11 +18,11 @@ public class Ads {
         this.count = count;
     }
 
-    public List<Ad> getResults() {
+    public List<AdDTO> getResults() {
         return results;
     }
 
-    public void setResults(List<Ad> results) {
+    public void setResults(List<AdDTO> results) {
         this.results = results;
     }
 }
